@@ -10,6 +10,9 @@ const myGame = {
     enemy: undefined,
     player1: undefined,
     score: undefined,
+    primerabala: undefined,
+    
+    
 
     canvasSize: {
         w: window.innerWidth,
@@ -24,13 +27,19 @@ const myGame = {
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
         //this.drawBackground('bgimage.png')
+
+
         background.initBackground()
         player.initPlayer()
         keyCaps.setEventListeners()
         
+        //this.primerabala = new Bullet(this.ctx, undefined, 500, 500, 100, 100, 20)
+        //this.primerabala.initBullet ()
+        
         this.start()
 
 
+        
 
 
     },
@@ -42,6 +51,8 @@ const myGame = {
         setInterval(() => {
             background.drawBackground(this.ctx)
             player.drawPlayer(this.ctx)
+            player.bullets.forEach(elm => elm.drawBullet ())
+            //this.primerabala.drawBullet ()
 
 
         }, 60)

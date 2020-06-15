@@ -6,6 +6,7 @@ const player = {
     posX: 0,
     posY: 800,
 
+    bullets: [],
 
     initPlayer() {
         this.player = new Image()
@@ -23,6 +24,12 @@ const player = {
     moveNave(dir) { 
         dir === 'left' && this.posX >= 0 ? this.posX -= this.vel : null
         dir === 'right' && this.posX <= myGame.canvasSize.w-80 ? this.posX += this.vel : null
+
+    },
+
+    shoot(){
+
+        this.bullets.push(new Bullet(this.ctx, this.posX, this.posY, Bullet.w, Bullet.h))
 
     }
 
