@@ -7,12 +7,18 @@ const myGame = {
     canvasDom: undefined,
     ctx: undefined,
     background1: undefined,
-    enemy: undefined,
+    enemys: [],
     player1: undefined,
     score: undefined,
     primerabala: undefined,
-    
-    
+    frames: 0,
+    numRandom: 0,
+    keyCaps: {
+        RIGHT: 37,
+        LEFT: 39,
+        SHOOT: 32
+    },
+
 
     canvasSize: {
         w: window.innerWidth,
@@ -26,59 +32,79 @@ const myGame = {
         this.canvasDom.setAttribute('width', this.canvasSize.w)
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
-        //this.drawBackground('bgimage.png')
+        
 
 
         background.initBackground()
         player.initPlayer()
-        keyCaps.setEventListeners()
-        
-        //this.primerabala = new Bullet(this.ctx, undefined, 500, 500, 100, 100, 20)
-        //this.primerabala.initBullet ()
-        
+        this.setEventListeners()
+
+
         this.start()
-
-
-        
-
 
     },
 
-    
+    setEventListeners() {
+        document.onkeydown = e => {
+
+            e.keyCode === 37 ? player.moveNave('left') : null
+            e.keyCode === 39 ? player.moveNave('right') : null
+            e.keyCode === 32 ? player.shoot(this.ctx) : null
+        }
+
+    },
+
 
     start() {
 
         setInterval(() => {
+            this.frames ++
+        
             background.drawBackground(this.ctx)
             player.drawPlayer(this.ctx)
-            player.bullets.forEach(elm => elm.drawBullet ())
-            //this.primerabala.drawBullet ()
+
+            player.bullets.forEach((elm) => elm.drawBullet())
+            player.clearBullets()
+
+            this.enemys.forEach(elm => elm.drawEnemy())
+
+            //console.log(this.frames)
+            this.generateEnemys ()
+            //console.log(this.enemys)
+            console.log(player.bullets)
+            this.clearEnemy ()
+            
 
 
         }, 60)
 
     },
 
-    
+    generateEnemys() { 
+        this.frames % 20 === 0 ? this.enemys.push(new Enemy(this.ctx, this.generateRandom (window.innerWidth,0),0,100,100,10)): null
+        
+    },
+
+    generateRandom(max,min) { 
+        this.numRandom = Math.floor(Math.random() * (max - min)+ min)
+        
+        console.log (this.numRandom)
+        return this.numRandom
+    },
+   
+    clearEnemy() {
+       
+        this.enemys = this.enemys.filter((ene) => ene.posEnemyY<= window.innerHeight);
+    }
+
 }
 
+// if (this.frames % 80 === 0) {
+//         const randomX = Math.floor(Math.random() * (360 - 0)) + 0;
+//         const randomW = Math.floor(Math.random() * (150 - 40)) + 40;
+//         this.obsArray.push(new Obstacle(this.ctx, randomX, 10, randomW, 20, 2, this.canvasSize))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//       }
 
 
 

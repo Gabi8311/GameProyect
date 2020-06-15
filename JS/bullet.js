@@ -1,30 +1,32 @@
 class Bullet {
-    constructor(ctx, bulletX, bulletY, bulletW, bulletH, bulletVel){
-        
-        this.ctx = ctx
-        this.bulletX = bulletX+40
-        this.bulletY = bulletY
-        this.bulletW=bulletW
-        this.bulletH=bulletH
+    constructor(ctx,bulletX, bulletY, bulletW, bulletH) {
+
+        this.ctx = ctx 
+        this.bulletX = bulletX -12
+        this.bulletY = bulletY -80
+        this.bulletW = bulletW
+        this.bulletH = bulletH
         this.bulletVel = 40
 
-        this.bulletSize= 3 
+        this.bulletSize = 3
     }
 
-    initBullet() {
-        this.bullet = new Image ()
-        this.bullet.src = 'images/bullet.png'
+    
+    drawBullet() {
 
+        this.bulletImg = new Image()
+        this.bulletImg.src = 'images/bullet.png'
+
+        this.ctx.drawImage(this.bulletImg, this.bulletX, this.bulletY, this.bulletW, this.bulletH)
+        this.moveBullets ()
     }
 
-    drawBullet(){
-        this.ctx.drawImage( this.bulletX, this.bulletY, this.bulletW, this.bulletH)
+
+    moveBullets() {
+        this.bulletY -= this.bulletVel
     }
 
 
-   moveBullets(){
-       this.bulletY -=this.bulletVel
-   }
 
 
 
