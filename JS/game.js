@@ -70,8 +70,9 @@ const myGame = {
 
             //console.log(this.frames)
             this.generateEnemys ()
-            //console.log(this.enemys)
+            console.log(this.enemys)
             console.log(player.bullets)
+            this.collisions ()
             this.clearEnemy ()
             
 
@@ -95,59 +96,39 @@ const myGame = {
     clearEnemy() {
        
         this.enemys = this.enemys.filter((ene) => ene.posEnemyY<= window.innerHeight);
+    },
+
+    collisions() { 
+
+        this.enemys.forEach(enemy1 => {
+            player.bullets.forEach(bullet1 => {
+                
+                if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
+                    enemy1.posEnemyX + enemy1.enemyW-30 > bullet1.bulletX &&
+                    enemy1.posEnemyY < bullet1.bulletY+100 + bullet1.bulletH &&
+                    enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
+                    
+                    
+                    enemy1.posEnemyY = 1000
+                    bullet1.bulletY = -100
+
+                   
+                    
+                }
+            })
+        }  ) 
+
+      
     }
 
 }
 
-// if (this.frames % 80 === 0) {
-//         const randomX = Math.floor(Math.random() * (360 - 0)) + 0;
-//         const randomW = Math.floor(Math.random() * (150 - 40)) + 40;
-//         this.obsArray.push(new Obstacle(this.ctx, randomX, 10, randomW, 20, 2, this.canvasSize))
-
-//       }
 
 
 
 
+    // (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
+    //     enemy1.posEnemyX + enemy1.enemyW > bullet1.bulletX &&
+    //     enemy1.posEnemyY < bullet1.bulletY + bullet1.bulletH &&
+    //     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// CODIGO POR REVISAR 
-
-//     drawBackground(bgName) {
-
-//         let bgImage = new Image();
-//         bgImage.src = `images/${bgName}`;
-//         bgImage.onload = () => {
-//             this.ctx.drawImage(
-//                 bgImage,
-//                 this.canvasSize.bgPosX,
-//                 this.canvasSize.bgPosY,
-//                 innerWidth,
-//                 innerHeight
-//             );
-
-
-//         }
-
-
-
-//     }
-// }
