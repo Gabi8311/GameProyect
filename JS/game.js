@@ -7,6 +7,7 @@ const myGame = {
     canvasDom: undefined,
     ctx: undefined,
     background1: undefined,
+    spriteBg: undefined,
     enemys: [],
     enemysStrong: [],
     goodCoins: [],
@@ -40,7 +41,11 @@ const myGame = {
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
 
+        this.spriteBg = new BgSprite (this.ctx, 0, 0, this.canvasSize.w, this.canvasSize.h, 5)
 
+        this.player1 = new SpritePlayer(this.ctx, innerWidth/2,innerHeight-150 , 100, 100)
+        
+        
 
         background.initBackground()
         player.initPlayer()
@@ -71,10 +76,16 @@ const myGame = {
             this.frames++
 
             background.drawBackground(this.ctx)
-            player.drawPlayer(this.ctx)
+
+            this.spriteBg.drawAsteroid()
+            this.player1.drawSpritePlayer(this.frames)
+            
+            //player.drawPlayer(this.ctx)
 
             player.bullets.forEach((elm) => elm.drawBullet())
+
             player.clearBullets()
+
 
             this.enemys.forEach(elm => elm.drawEnemy())
 
@@ -85,15 +96,10 @@ const myGame = {
 
             this.badCoins.forEach(elm => elm.drawBadCoin())
 
-
-
             this.generateEnemys()
             this.collisions()
             this.clearEnemy()
             this.clearCoins()
-
-
-
 
         }, 60)
 

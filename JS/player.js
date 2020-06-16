@@ -37,13 +37,8 @@ const player = {
 
     },
 
-    clearBullets() {//Esto hay que arreglarlo con el filter
-        // this.bullets.forEach(elm => {
-        //     if (elm.bulletY <= -100) {
-        //         this.bullets.pop(elm)
-           
-        //     }
-        // })
+    clearBullets() {
+        
         this.bullets = this.bullets.filter((ene) => ene.bulletY >= -100);
 
     }

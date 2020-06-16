@@ -8,7 +8,7 @@ const background = {
 
     initBackground() {
         this.background = new Image()
-        this.background.src = 'images/bgimage.png'
+        this.background.src = 'images/fondoPlaneta.jpg'
     },
     drawBackground(ctx) {
         ctx.drawImage(this.background, this.bgPosX, this.bgPosY, this.bgWidth, this.bgHeight)
