@@ -5,7 +5,7 @@ class Coins {
         this.posCoinY = posCoinY
         this.coinSizeW = coinSizeW
         this.coinSizeH = coinSizeH
-        this.velCoin = 5
+        this.velCoin = velCoin
 
     }
     drawGoodCoin() {

@@ -2,7 +2,7 @@ class Bullet {
     constructor(ctx,bulletX, bulletY, bulletW, bulletH) {
 
         this.ctx = ctx 
-        this.bulletX = bulletX -12
+        this.bulletX = bulletX +40
         this.bulletY = bulletY -80
         this.bulletW = bulletW
         this.bulletH = bulletH
@@ -13,9 +13,10 @@ class Bullet {
 
     
     drawBullet() {
+        console.log ('ksjhdfkajshdfkjhadskjfhadskfjh')
 
         this.bulletImg = new Image()
-        this.bulletImg.src = 'images/bullet.png'
+        this.bulletImg.src = 'images/misil.png'
 
         this.ctx.drawImage(this.bulletImg, this.bulletX, this.bulletY, this.bulletW, this.bulletH)
         this.moveBullets ()
@@ -24,6 +25,7 @@ class Bullet {
 
     moveBullets() {
         this.bulletY -= this.bulletVel
+        
     }
 
 

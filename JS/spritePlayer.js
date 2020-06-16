@@ -1,9 +1,9 @@
 class SpritePlayer { 
 
-    constructor(ctx, playerPosX, playerPosy, playerW, playerH) { 
+    constructor(ctx, playerPosX, playerPosY, playerW, playerH) { 
         this.ctx = ctx
         this.playerPosX = playerPosX
-        this.playerPosy = playerPosy
+        this.playerPosY = playerPosY
         this.playerW = playerW
         this.playerH = playerH
         this.image = new Image()
@@ -11,7 +11,7 @@ class SpritePlayer {
         this.velPlayer = 5
         this.image.frames = 4
         this.image.framesIndex =0
-
+        this.bullets= []
     }
 
     drawSpritePlayer(frames) { 
@@ -20,32 +20,43 @@ class SpritePlayer {
             Math.floor(this.image.width / this.image.frames),
             this.image.height/2,
             this.playerPosX,
-            this.playerPosy,
+            this.playerPosY,
             this.playerW,
             this.playerH)
         
-        
-        this.animate(frames)
-        
+        this.animate(frames) 
             
     }
 
     animate(frames) { 
-        if (frames % 5 == 0) { 
+        if (frames % 2 == 0) { 
             this.image.framesIndex ++
         }
 
         if (this.image.framesIndex > this.image.frames - 1) { 
             this.image.framesIndex = 0
         }
+
     }
 
-    
+    moveNave(dir) {
+        dir === 'left' && this.playerPosX >= 0 ? this.playerPosX -= this.velPlayer : null
+        dir === 'right' && this.playerPosX <= myGame.canvasSize.w - 80 ? this.playerPosX += this.velPlayer : null
+        dir === 'up' && this.playerPosY >= 500 ? this.playerPosY : this.playerPosY += this.velPlayer
+        dir === 'down' && this.playerPosY <= innerHeight - this.playerH ? this.playerPosY : this.playerPosY -= this.velPlayer
+    }
 
+    shoot(ctx) {
 
+        this.bullets.push(new Bullet(ctx, this.playerPosX, this.playerPosY, 25, 60))
 
+    }
 
+    clearBullets() {
 
+        this.bullets = this.bullets.filter((ene) => ene.bulletY >= -100);
+
+    }
 
 }
 

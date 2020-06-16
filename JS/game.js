@@ -27,10 +27,9 @@ const myGame = {
         SHOOT: 32,
     },
 
-
     canvasSize: {
-        w: window.innerWidth,
-        h: window.innerHeight,
+        w: innerWidth,
+        h: innerHeight,
         bgPosX: 0,
         bgPosY: 0
     },
@@ -40,72 +39,76 @@ const myGame = {
         this.canvasDom.setAttribute('width', this.canvasSize.w)
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
-
+        this.player1 = new SpritePlayer(this.ctx, innerWidth / 2, innerHeight -150 , 100, 100)
+        
         this.spriteBg = new BgSprite (this.ctx, 0, 0, this.canvasSize.w, this.canvasSize.h, 5)
-
-        this.player1 = new SpritePlayer(this.ctx, innerWidth/2,innerHeight-150 , 100, 100)
         
-        
-
-        background.initBackground()
-        player.initPlayer()
+        // player.initPlayer()
         this.setEventListeners()
-
+        background.initBackground()
 
         this.start()
 
     },
-
+    // clearScreen() {
+    //     this.clearRect(0, 0, this.canvasSize.w, this.canvasSize.h);
+    //   },
     setEventListeners() {
+        
         document.onkeydown = e => {
 
-            e.keyCode === 37 ? player.moveNave('left') : null
-            e.keyCode === 39 ? player.moveNave('right') : null
-            e.keyCode === 38 ? player.moveNave('up') : null
-            e.keyCode === 40 ? player.moveNave('down') : null
-            e.keyCode === 32 ? player.shoot(this.ctx) : null
+            e.keyCode === 37 ? this.player1.moveNave('left') : null
+            e.keyCode === 39 ? this.player1.moveNave('right') : null
+            e.keyCode === 38 ? this.player1.moveNave('up') : null
+            e.keyCode === 40 ? this.player1.moveNave('down') : null
+            e.keyCode === 32 ? this.player1.shoot(this.ctx) : null
         }
 
     },
 
-
     start() {
 
         setInterval(() => {
+            this.clearScreen ()
 
             this.frames++
 
             background.drawBackground(this.ctx)
 
             this.spriteBg.drawAsteroid()
+
             this.player1.drawSpritePlayer(this.frames)
             
             //player.drawPlayer(this.ctx)
+            console.log (this.player1.bullets)
 
-            player.bullets.forEach((elm) => elm.drawBullet())
-
-            player.clearBullets()
-
+            this.player1.bullets.forEach((elm) => elm.drawBullet())
 
             this.enemys.forEach(elm => elm.drawEnemy())
-
+            
             this.enemysStrong.forEach(elm => elm.drawStrongEnemy())
-
+            
             this.goodCoins.forEach(elm => elm.drawGoodCoin())
-
-
+            
             this.badCoins.forEach(elm => elm.drawBadCoin())
 
+            this.player1.clearBullets()
+            
             this.generateEnemys()
             this.collisions()
             this.clearEnemy()
             this.clearCoins()
-
+            
         }, 60)
 
     },
 
+    clearScreen() {
+        this.ctx.clearRect(0, 0, this.canvasSize.w, this.canvasSize.h)
+    },
+
     generateEnemys() {
+
         this.frames % 20 === 0 ? this.enemys.push(new Enemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
         //SEGUNDA CREACION DE ENEMYS
         this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
@@ -116,13 +119,12 @@ const myGame = {
 
         this.numRandom = Math.floor(Math.random() * (max - min) + min)
 
-
         return this.numRandom
     },
 
     clearEnemy() {
 
-        this.enemys = this.enemys.filter((ene) => ene.posEnemyY <= window.innerHeight);
+        this.enemys = this.enemys.filter((ene) => ene.posEnemyY <= innerHeight);
     },
 
 
@@ -133,13 +135,11 @@ const myGame = {
 
     },
 
-
-
     collisions() {
 
         // COLISION ENEMY- BULLET
         this.enemys.forEach(enemy1 => {
-            player.bullets.forEach(bullet1 => {
+            this.player1.bullets.forEach(bullet1 => {
 
                 if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
                     enemy1.posEnemyX + enemy1.enemyW - 30 > bullet1.bulletX &&
@@ -147,58 +147,45 @@ const myGame = {
                     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
 
                     this.generateCoin = this.generateRandom(6, 1)
-                    this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+                    this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
 
-                    this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+                    this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
 
-
-
-
-                    player.bullets.pop()
-
+                    this.player1.bullets.pop()
 
                     enemy1.posEnemyY = 10000
-
-
-
-                    this.killed = true
 
                 }
 
             })
+
         })
 
         //COLISION ENEMY-PLAYER
         this.enemys.forEach(enemy1 => {
 
+            if (enemy1.posEnemyX < this.player1.playerPosX + this.player1.playerW &&
+                enemy1.posEnemyX + enemy1.enemyW - 40 > this.player1.playerPosX &&
+                enemy1.posEnemyY < this.player1.playerPosY + 50 + this.player1.playerH &&
+                enemy1.enemyH + enemy1.posEnemyY > this.player1.playerPosY + 50) {
 
-            if (enemy1.posEnemyX < player.posX + player.playerWidth &&
-                enemy1.posEnemyX + enemy1.enemyW - 40 > player.posX &&
-                enemy1.posEnemyY < player.posY + 50 + player.playerHeight &&
-                enemy1.enemyH + enemy1.posEnemyY > player.posY + 50) {
-
-
-                player.posX = window.innerWidth / 2,
-                    player.posY = window.innerHeight - 100
-
+                    this.player1.playerPosX = innerWidth / 2,
+                    this.player1.playerPosY = innerHeight - 100
 
             }
 
         })
 
-
         //COLISION ENEMYSTRONG-PLAYER
         this.enemysStrong.forEach(enemy1 => {
 
+            if (enemy1.posEnemyX < this.player1.playerPosX + this.player1.playerW &&
+                enemy1.posEnemyX + enemy1.enemyW - 40 > this.player1.playerPosX &&
+                enemy1.posEnemyY < this.player1.playerPosY + 50 + this.player1.playerH &&
+                enemy1.enemyH + enemy1.posEnemyY > this.player1.playerPosY + 50) {
 
-            if (enemy1.posEnemyX < player.posX + player.playerWidth &&
-                enemy1.posEnemyX + enemy1.enemyW - 40 > player.posX &&
-                enemy1.posEnemyY < player.posY + 50 + player.playerHeight &&
-                enemy1.enemyH + enemy1.posEnemyY > player.posY + 50) {
-
-                player.posX = window.innerWidth / 2,
-                    player.posY = window.innerHeight - 100
-
+                this.player1.playerPosX = innerWidth / 2,
+                    this.player1.playerPosY = innerHeight - 100
 
             }
 
@@ -206,7 +193,7 @@ const myGame = {
 
         //ESTO HACE QUE SE MUERAN DE TRES DISPAROS
         this.enemysStrong.forEach(enemy1 => {
-            player.bullets.forEach(bullet1 => {
+            this.player1.bullets.forEach(bullet1 => {
 
                 if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
                     enemy1.posEnemyX + enemy1.enemyW - 30 > bullet1.bulletX &&
@@ -220,14 +207,13 @@ const myGame = {
 
                     if (enemy1.health === 0) {
                         this.generateCoin = this.generateRandom(6, 1)
-                        this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+                        this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
 
-                        this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+                        this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
                         enemy1.posEnemyY = 10000
                     }
 
                 }
-
 
             })
         })
@@ -235,26 +221,25 @@ const myGame = {
 
         this.goodCoins.forEach(enemy1 => {
 
-
-            if (enemy1.posCoinX < player.posX + player.playerWidth &&
-                enemy1.posCoinX + enemy1.coinSizeW > player.posX &&
-                enemy1.posCoinY < player.posY + player.playerHeight &&
-                enemy1.coinSizeH + enemy1.posCoinY > player.posY) {
+            if (enemy1.posCoinX < this.player1.playerPosX + this.player1.playerW &&
+                enemy1.posCoinX + enemy1.coinSizeW > this.player1.playerPosX &&
+                enemy1.posCoinY < this.player1.playerPosY + this.player1.playerH &&
+                enemy1.coinSizeH + enemy1.posCoinY > this.player1.playerPosY) {
 
                 enemy1.posCoinY = 10000
 
             }
 
         })
+
         //COLISION BADMONEDA-PLAYER
 
         this.badCoins.forEach(enemy1 => {
 
-
-            if (enemy1.posCoinX < player.posX + player.playerWidth &&
-                enemy1.posCoinX + enemy1.coinSizeW > player.posX &&
-                enemy1.posCoinY < player.posY + player.playerHeight &&
-                enemy1.coinSizeH + enemy1.posCoinY > player.posY) {
+            if (enemy1.posCoinX < this.player1.playerPosX + this.player1.playerW &&
+                enemy1.posCoinX + enemy1.coinSizeW > this.player1.playerPosX &&
+                enemy1.posCoinY < this.player1.playerPosY + this.player1.playerH &&
+                enemy1.coinSizeH + enemy1.posCoinY > this.player1.playerPosY) {
 
                 enemy1.posCoinY = 10000
 
