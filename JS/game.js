@@ -8,15 +8,22 @@ const myGame = {
     ctx: undefined,
     background1: undefined,
     enemys: [],
+    enemysStrong: [],
+    goodCoins: [],
+    badCoins: [],
     player1: undefined,
     score: undefined,
-    primerabala: undefined,
+    killed: undefined,
+    generateCoin: undefined,
     frames: 0,
+    counter: 0, //CONTADOR PARA LOS ENEMYGOS DE 3 DISPAROS
     numRandom: 0,
     keyCaps: {
-        RIGHT: 37,
-        LEFT: 39,
-        SHOOT: 32
+        UP: 38,
+        DOWN: 40,
+        LEFT: 37,
+        RIGHT: 39,
+        SHOOT: 32,
     },
 
 
@@ -32,7 +39,7 @@ const myGame = {
         this.canvasDom.setAttribute('width', this.canvasSize.w)
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
-        
+
 
 
         background.initBackground()
@@ -49,6 +56,8 @@ const myGame = {
 
             e.keyCode === 37 ? player.moveNave('left') : null
             e.keyCode === 39 ? player.moveNave('right') : null
+            e.keyCode === 38 ? player.moveNave('up') : null
+            e.keyCode === 40 ? player.moveNave('down') : null
             e.keyCode === 32 ? player.shoot(this.ctx) : null
         }
 
@@ -58,8 +67,9 @@ const myGame = {
     start() {
 
         setInterval(() => {
-            this.frames ++
-        
+
+            this.frames++
+
             background.drawBackground(this.ctx)
             player.drawPlayer(this.ctx)
 
@@ -68,57 +78,183 @@ const myGame = {
 
             this.enemys.forEach(elm => elm.drawEnemy())
 
-            //console.log(this.frames)
-            this.generateEnemys ()
-            console.log(this.enemys)
-            console.log(player.bullets)
-            this.collisions ()
-            this.clearEnemy ()
-            
+            this.enemysStrong.forEach(elm => elm.drawStrongEnemy())
+
+            this.goodCoins.forEach(elm => elm.drawGoodCoin())
+
+
+            this.badCoins.forEach(elm => elm.drawBadCoin())
+
+
+
+            this.generateEnemys()
+            this.collisions()
+            this.clearEnemy()
+            this.clearCoins()
+
+
 
 
         }, 60)
 
     },
 
-    generateEnemys() { 
-        this.frames % 20 === 0 ? this.enemys.push(new Enemy(this.ctx, this.generateRandom (window.innerWidth,0),0,100,100,10)): null
-        
+    generateEnemys() {
+        this.frames % 20 === 0 ? this.enemys.push(new Enemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
+        //SEGUNDA CREACION DE ENEMYS
+        this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
+
     },
 
-    generateRandom(max,min) { 
-        this.numRandom = Math.floor(Math.random() * (max - min)+ min)
-        
-        console.log (this.numRandom)
+    generateRandom(max, min) {
+
+        this.numRandom = Math.floor(Math.random() * (max - min) + min)
+
+
         return this.numRandom
     },
-   
+
     clearEnemy() {
-       
-        this.enemys = this.enemys.filter((ene) => ene.posEnemyY<= window.innerHeight);
+
+        this.enemys = this.enemys.filter((ene) => ene.posEnemyY <= window.innerHeight);
     },
 
-    collisions() { 
 
+    clearCoins() {
+
+        this.goodCoins = this.goodCoins.filter((good) => good.posCoinY <= innerHeight);
+        this.badCoins = this.badCoins.filter((bad) => bad.posCoinY <= innerHeight);
+
+    },
+
+
+
+    collisions() {
+
+        // COLISION ENEMY- BULLET
         this.enemys.forEach(enemy1 => {
             player.bullets.forEach(bullet1 => {
-                
+
                 if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
-                    enemy1.posEnemyX + enemy1.enemyW-30 > bullet1.bulletX &&
-                    enemy1.posEnemyY < bullet1.bulletY+100 + bullet1.bulletH &&
+                    enemy1.posEnemyX + enemy1.enemyW - 30 > bullet1.bulletX &&
+                    enemy1.posEnemyY < bullet1.bulletY + 100 + bullet1.bulletH &&
                     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
-                    
-                    
-                    enemy1.posEnemyY = 1000
+
+                    this.generateCoin = this.generateRandom(6, 1)
+                    this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+
+                    this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+
+
+
+
+                    player.bullets.pop()
+
+
+                    enemy1.posEnemyY = 10000
+
+
+
+                    this.killed = true
+
+                }
+
+            })
+        })
+
+        //COLISION ENEMY-PLAYER
+        this.enemys.forEach(enemy1 => {
+
+
+            if (enemy1.posEnemyX < player.posX + player.playerWidth &&
+                enemy1.posEnemyX + enemy1.enemyW - 40 > player.posX &&
+                enemy1.posEnemyY < player.posY + 50 + player.playerHeight &&
+                enemy1.enemyH + enemy1.posEnemyY > player.posY + 50) {
+
+
+                player.posX = window.innerWidth / 2,
+                    player.posY = window.innerHeight - 100
+
+
+            }
+
+        })
+
+
+        //COLISION ENEMYSTRONG-PLAYER
+        this.enemysStrong.forEach(enemy1 => {
+
+
+            if (enemy1.posEnemyX < player.posX + player.playerWidth &&
+                enemy1.posEnemyX + enemy1.enemyW - 40 > player.posX &&
+                enemy1.posEnemyY < player.posY + 50 + player.playerHeight &&
+                enemy1.enemyH + enemy1.posEnemyY > player.posY + 50) {
+
+                player.posX = window.innerWidth / 2,
+                    player.posY = window.innerHeight - 100
+
+
+            }
+
+        })
+
+        //ESTO HACE QUE SE MUERAN DE TRES DISPAROS
+        this.enemysStrong.forEach(enemy1 => {
+            player.bullets.forEach(bullet1 => {
+
+                if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
+                    enemy1.posEnemyX + enemy1.enemyW - 30 > bullet1.bulletX &&
+                    enemy1.posEnemyY < bullet1.bulletY + 100 + bullet1.bulletH &&
+                    enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
+
+                    enemy1.health--
+                    //this.counter++
                     bullet1.bulletY = -100
 
-                   
-                    
-                }
-            })
-        }  ) 
 
-      
+                    if (enemy1.health === 0) {
+                        this.generateCoin = this.generateRandom(6, 1)
+                        this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+
+                        this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 5)) : null
+                        enemy1.posEnemyY = 10000
+                    }
+
+                }
+
+
+            })
+        })
+        //COLISION MONEDA-PLAYER
+
+        this.goodCoins.forEach(enemy1 => {
+
+
+            if (enemy1.posCoinX < player.posX + player.playerWidth &&
+                enemy1.posCoinX + enemy1.coinSizeW > player.posX &&
+                enemy1.posCoinY < player.posY + player.playerHeight &&
+                enemy1.coinSizeH + enemy1.posCoinY > player.posY) {
+
+                enemy1.posCoinY = 10000
+
+            }
+
+        })
+        //COLISION BADMONEDA-PLAYER
+
+        this.badCoins.forEach(enemy1 => {
+
+
+            if (enemy1.posCoinX < player.posX + player.playerWidth &&
+                enemy1.posCoinX + enemy1.coinSizeW > player.posX &&
+                enemy1.posCoinY < player.posY + player.playerHeight &&
+                enemy1.coinSizeH + enemy1.posCoinY > player.posY) {
+
+                enemy1.posCoinY = 10000
+
+            }
+
+        })
     }
 
 }
@@ -127,8 +263,5 @@ const myGame = {
 
 
 
-    // (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
-    //     enemy1.posEnemyX + enemy1.enemyW > bullet1.bulletX &&
-    //     enemy1.posEnemyY < bullet1.bulletY + bullet1.bulletH &&
-    //     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY)
+
 

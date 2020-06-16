@@ -5,7 +5,7 @@ const player = {
     playerHeight: 90,
     vel: 10,
     posX: 0,
-    posY: 800,
+    posY: window.innerHeight-150,
 
     bullets: [],
 
@@ -25,7 +25,8 @@ const player = {
     moveNave(dir) {
         dir === 'left' && this.posX >= 0 ? this.posX -= this.vel : null
         dir === 'right' && this.posX <= myGame.canvasSize.w - 80 ? this.posX += this.vel : null
-
+        dir === 'up' && this.posY  >= 500 ? this.posY : this.posY +=this.vel
+        dir === 'down' && this.posY <= innerHeight-this.playerHeight ? this.posY : this.posY -=this.vel
     },
 
     shoot(ctx) {
