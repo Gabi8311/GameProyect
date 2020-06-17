@@ -47,6 +47,7 @@ class SpritePlayer {
     }
 
     shoot(ctx) {
+        myGame.audioLaser.play ()
 
         this.bullets.push(new Bullet(ctx, this.playerPosX, this.playerPosY, 25, 60))
 

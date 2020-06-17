@@ -1,6 +1,20 @@
 *{
     margin:0;
     padding: 0;
-   
 }
 
+#start-button {
+    font-size: 30px;
+    text-transform: uppercase;
+    border-radius: 20px;
+    position: absolute;
+    left: 530px;
+    bottom: 120px;
+    padding: 10px 73px;
+    margin: 10px auto;
+    color: white;
+    background-color: rgb(0, 172, 100);
+    box-shadow: 5px 5px 8px #3d3d3d;
+    z-index: -100;
+    transition: all .5s ease-in-out;
+}

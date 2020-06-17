@@ -11,6 +11,8 @@ const myGame = {
     interval: undefined,
     badCoinCounter: undefined,
     audioGame: undefined,
+    audioCoin: undefined,
+    audioLaser: undefined,
     enemys: [],
     enemysStrong: [],
     goodCoins: [],
@@ -23,13 +25,13 @@ const myGame = {
     generateCoin: undefined,
     frames: 0,
     numRandom: 0,
-    keyCaps: {
-        UP: 38,
-        DOWN: 40,
-        LEFT: 37,
-        RIGHT: 39,
-        SHOOT: 32,
-    },
+    // keyCaps: {
+    //     UP: 38,
+    //     DOWN: 40,
+    //     LEFT: 37,
+    //     RIGHT: 39,
+    //     SHOOT: 32,
+    // },
 
     canvasSize: {
         w: innerWidth,
@@ -39,7 +41,10 @@ const myGame = {
     },
 
     init(id) {
-        
+
+
+
+
         this.canvasDom = document.getElementById(id)
         this.canvasDom.setAttribute('width', this.canvasSize.w)
         this.canvasDom.setAttribute('height', this.canvasSize.h)
@@ -66,15 +71,16 @@ const myGame = {
                 e.keyCode === 37 ? this.player1.moveNave('right') : null
                 e.keyCode === 40 ? this.player1.moveNave('up') : null
                 e.keyCode === 38 ? this.player1.moveNave('down') : null
-                e.keyCode === 32 ? this.player1.shoot(this.ctx) : null
-                
+                e.keyCode === 88 ? this.player1.shoot(this.ctx) : null
+
             } else {
                 e.keyCode === 37 ? this.player1.moveNave('left') : null
                 e.keyCode === 39 ? this.player1.moveNave('right') : null
                 e.keyCode === 38 ? this.player1.moveNave('up') : null
                 e.keyCode === 40 ? this.player1.moveNave('down') : null
-                e.keyCode === 32 ? this.player1.shoot(this.ctx) : null
+                e.keyCode === 88 ? this.player1.shoot(this.ctx) : null
                 this.badCoinCounter = undefined
+
 
             }
         }
@@ -83,16 +89,22 @@ const myGame = {
 
     start() {
 
+        this.audioCoin = new Audio('audio/moneda.mp3')
+        this.audioGame = new Audio('audio/wii.mp3')
+        this.audioLaser = new Audio('audio/laser.wav')
         this.interval = setInterval(() => {
-            
+            this.audioGame.play()
+            this.audioGame.volume = 0.1
+
+
             if (this.badCoinCounter === 0) {
 
                 this.badCoinCounter = undefined
             }
-            console.log (this.goodCoins)
-            
+
+
             this.clearScreen()
-           
+
             this.frames++
 
             this.badCoinCounter--
@@ -120,7 +132,7 @@ const myGame = {
             this.player1.clearBullets()
 
             if (this.scoreLife === 0 || this.timer === 0) {
-                //this.gameOver()
+                this.gameOver()
             }
 
             this.drawScoreLife()
@@ -128,7 +140,7 @@ const myGame = {
             this.collisions()
             this.clearEnemy()
             this.clearCoins()
-           
+
 
 
         }, 60)
@@ -139,10 +151,13 @@ const myGame = {
         let myImage = new Image()
         myImage.src = 'images/GameOver.png'
         myImage.onload = () => this.ctx.drawImage(myImage, innerWidth / 2 - 200, innerHeight / 2 - 100, 400, 200)
+        let filter = new Image()
+        filter.src = 'images/filtro.png'
+        filter.onload = () => this.ctx.drawImage(filter, 0, 0, innerWidth, innerHeight)
         clearInterval(this.interval)
 
     },
-    
+
     drawScoreLife() {
 
         let heart
@@ -186,7 +201,7 @@ const myGame = {
     },
 
     generateEnemys() {
-        
+
         this.frames % 20 === 0 ? this.enemys.push(new SoftEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
         //SEGUNDA CREACION DE ENEMYS
         this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
@@ -283,7 +298,7 @@ const myGame = {
                     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
 
                     enemy1.health--
-                   
+
                     bullet1.bulletY = -100
 
                     if (enemy1.health === 0) {
@@ -309,6 +324,7 @@ const myGame = {
 
                 enemy1.posCoinY = 10000
                 this.score += 10
+                this.audioCoin.play()
 
                 if ((this.timer + 5) >= 60) {
 
@@ -317,7 +333,7 @@ const myGame = {
                 } else {
 
                     this.timer += 5
-                    
+
                 }
 
             }
