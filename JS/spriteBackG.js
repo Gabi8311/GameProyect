@@ -16,7 +16,7 @@ class BgSprite  {
     this.astImage = new Image()
     this.astImage.src = 'images/asteroids.png'
         
-    this.astImage.onload = () => {
+    //this.astImage.onload = () => {
       this.ctx.drawImage(
         this.astImage,
         this.posAstX,
@@ -31,8 +31,8 @@ class BgSprite  {
         innerWidth,
         innerHeight
       );
-      this.moveImage();
-    };
+    //};
+    this.moveImage();
   }
 
   moveImage() {
