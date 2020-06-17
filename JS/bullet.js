@@ -10,11 +10,9 @@ class Bullet {
 
         this.bulletSize = 3
     }
-
     
     drawBullet() {
     
-
         this.bulletImg = new Image()
         this.bulletImg.src = 'images/misil.png'
 
@@ -22,14 +20,9 @@ class Bullet {
         this.moveBullets ()
     }
 
-
     moveBullets() {
         this.bulletY -= this.bulletVel
         
     }
-
-
-
-
 
 }

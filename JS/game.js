@@ -22,7 +22,6 @@ const myGame = {
     killed: undefined,
     generateCoin: undefined,
     frames: 0,
-    counter: 0, //CONTADOR PARA LOS ENEMYGOS DE 3 DISPAROS
     numRandom: 0,
     keyCaps: {
         UP: 38,
@@ -112,11 +111,11 @@ const myGame = {
 
             this.enemys.forEach(elm => elm.drawEnemy(this.frames))
 
-            this.enemysStrong.forEach(elm => elm.drawStrongEnemy(this.frames))
+            this.enemysStrong.forEach(elm => elm.drawEnemy(this.frames))
 
-            this.goodCoins.forEach(elm => elm.drawGoodCoin(this.frames))
+            this.goodCoins.forEach(elm => elm.drawCoin(this.frames))
 
-            this.badCoins.forEach(elm => elm.drawBadCoin(this.frames))
+            this.badCoins.forEach(elm => elm.drawCoin(this.frames))
 
             this.player1.clearBullets()
 
@@ -188,7 +187,7 @@ const myGame = {
 
     generateEnemys() {
         
-        this.frames % 20 === 0 ? this.enemys.push(new Enemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
+        this.frames % 20 === 0 ? this.enemys.push(new SoftEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
         //SEGUNDA CREACION DE ENEMYS
         this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
 
@@ -229,7 +228,7 @@ const myGame = {
                     this.generateCoin = this.generateRandom(11, 1)
                     this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
 
-                    this.generateCoin > 4 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
+                    this.generateCoin > 4 ? this.goodCoins.push(new GoodCoin(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
 
                     this.player1.bullets.pop()
 
@@ -284,14 +283,14 @@ const myGame = {
                     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
 
                     enemy1.health--
-                    //this.counter++
+                   
                     bullet1.bulletY = -100
 
                     if (enemy1.health === 0) {
                         this.generateCoin = this.generateRandom(11, 1)
                         this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
 
-                        this.generateCoin > 4 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
+                        this.generateCoin > 4 ? this.goodCoins.push(new GoodCoin(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
                         enemy1.posEnemyY = 10000
                     }
 

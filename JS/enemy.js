@@ -6,10 +6,8 @@ class Enemy{
         this.enemyW = enemyW
         this.enemyH = enemyH
         this.velEnemy = velEnemy 
-        this.enemyImg = new Image()
-        this.enemyImg.src = 'images/monstruito.png'
-        this.enemyImg.frames = 4
-        this.enemyImg.framesIndex = 0
+
+       
         
     }
     
@@ -25,7 +23,7 @@ class Enemy{
             this.enemyW,
             this.enemyH)
         
-        //this.moveEnemy 
+        
         this.animateEnemy (frames)
         
     }
@@ -45,6 +43,40 @@ class Enemy{
     moveEnemy() {
         this.posEnemyY += this.velEnemy
 
+    }
+
+}
+
+
+
+//----------------------------------------------------------------------
+class StrongEnemy extends Enemy {
+
+    constructor(ctx, posEnemyX, posEnemyY, enemyW, enemyH, velEnemy, health) {
+
+        super(ctx, posEnemyX, posEnemyY, enemyW, enemyH, velEnemy)
+
+        this.health = health
+        this.enemyImg = new Image()
+        this.enemyImg.src = 'images/Fantasma.png'
+        this.enemyImg.frames = 10
+        this.enemyImg.framesIndex = 0
+    }
+
+   
+}
+
+class SoftEnemy extends Enemy { 
+
+    constructor(ctx, posEnemyX, posEnemyY, enemyW, enemyH, velEnemy, health) {
+
+        super(ctx, posEnemyX, posEnemyY, enemyW, enemyH, velEnemy)
+
+        this.health = health
+        this.enemyImg = new Image()
+        this.enemyImg.src = 'images/monstruito.png'
+        this.enemyImg.frames = 4
+        this.enemyImg.framesIndex = 0
     }
 
 }
