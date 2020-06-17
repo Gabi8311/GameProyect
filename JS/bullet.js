@@ -13,7 +13,7 @@ class Bullet {
 
     
     drawBullet() {
-        console.log ('ksjhdfkajshdfkjhadskjfhadskfjh')
+    
 
         this.bulletImg = new Image()
         this.bulletImg.src = 'images/misil.png'

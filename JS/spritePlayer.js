@@ -7,7 +7,7 @@ class SpritePlayer {
         this.playerW = playerW
         this.playerH = playerH
         this.image = new Image()
-        this.image.src = 'images/pruebaNave.png'
+        this.image.src = 'images/naveFuegoo.png'
         this.velPlayer = 5
         this.image.frames = 4
         this.image.framesIndex =0
@@ -18,7 +18,7 @@ class SpritePlayer {
         this.ctx.drawImage(this.image, this.image.framesIndex * Math.floor(this.image.width / this.image.frames),
             0,
             Math.floor(this.image.width / this.image.frames),
-            this.image.height/2,
+            this.image.height,
             this.playerPosX,
             this.playerPosY,
             this.playerW,

@@ -10,6 +10,7 @@ const myGame = {
     spriteBg: undefined,
     interval: undefined,
     badCoinCounter: undefined,
+    audioGame: undefined,
     enemys: [],
     enemysStrong: [],
     goodCoins: [],
@@ -39,10 +40,12 @@ const myGame = {
     },
 
     init(id) {
+        
         this.canvasDom = document.getElementById(id)
         this.canvasDom.setAttribute('width', this.canvasSize.w)
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
+
         this.player1 = new SpritePlayer(this.ctx, innerWidth / 2, innerHeight - 150, 100, 100)
 
         this.spriteBg = new BgSprite(this.ctx, 0, 0, this.canvasSize.w, this.canvasSize.h, 5)
@@ -82,50 +85,51 @@ const myGame = {
     start() {
 
         this.interval = setInterval(() => {
+            
             if (this.badCoinCounter === 0) {
 
                 this.badCoinCounter = undefined
             }
+            console.log (this.goodCoins)
+            
             this.clearScreen()
-
+           
             this.frames++
+
             this.badCoinCounter--
 
-            console.log(this.badCoinCounter)
-
             background.drawBackground(this.ctx)
-
 
             this.spriteBg.drawAsteroid()
 
             this.player1.drawSpritePlayer(this.frames)
 
-
-            console.log(this.player1.bullets)
             this.drawScore()
+
             this.drawTime()
 
             this.player1.bullets.forEach((elm) => elm.drawBullet())
 
-            this.enemys.forEach(elm => elm.drawEnemy())
+            this.enemys.forEach(elm => elm.drawEnemy(this.frames))
 
-            this.enemysStrong.forEach(elm => elm.drawStrongEnemy())
+            this.enemysStrong.forEach(elm => elm.drawStrongEnemy(this.frames))
 
-            this.goodCoins.forEach(elm => elm.drawGoodCoin())
+            this.goodCoins.forEach(elm => elm.drawGoodCoin(this.frames))
 
-            this.badCoins.forEach(elm => elm.drawBadCoin())
+            this.badCoins.forEach(elm => elm.drawBadCoin(this.frames))
 
             this.player1.clearBullets()
 
             if (this.scoreLife === 0 || this.timer === 0) {
                 //this.gameOver()
             }
-            this.drawScoreLife()
 
+            this.drawScoreLife()
             this.generateEnemys()
             this.collisions()
             this.clearEnemy()
             this.clearCoins()
+           
 
 
         }, 60)
@@ -139,6 +143,7 @@ const myGame = {
         clearInterval(this.interval)
 
     },
+    
     drawScoreLife() {
 
         let heart
@@ -182,7 +187,7 @@ const myGame = {
     },
 
     generateEnemys() {
-
+        
         this.frames % 20 === 0 ? this.enemys.push(new Enemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
         //SEGUNDA CREACION DE ENEMYS
         this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
@@ -198,7 +203,8 @@ const myGame = {
 
     clearEnemy() {
 
-        this.enemys = this.enemys.filter((ene) => ene.posEnemyY <= innerHeight);
+        this.enemys = this.enemys.filter((ene) => ene.posEnemyY <= innerHeight)
+        this.enemysStrong = this.enemysStrong.filter((ene) => ene.posEnemyY <= innerHeight);
     },
 
 
@@ -221,9 +227,9 @@ const myGame = {
                     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
 
                     this.generateCoin = this.generateRandom(11, 1)
-                    this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
+                    this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
 
-                    this.generateCoin > 4 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
+                    this.generateCoin > 4 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
 
                     this.player1.bullets.pop()
 
@@ -281,12 +287,11 @@ const myGame = {
                     //this.counter++
                     bullet1.bulletY = -100
 
-
                     if (enemy1.health === 0) {
-                        this.generateCoin = this.generateRandom(6, 1)
-                        this.generateCoin === 5 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
+                        this.generateCoin = this.generateRandom(11, 1)
+                        this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
 
-                        this.generateCoin != 5 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 20, 20, 10)) : null
+                        this.generateCoin > 4 ? this.goodCoins.push(new Coins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
                         enemy1.posEnemyY = 10000
                     }
 
@@ -305,10 +310,15 @@ const myGame = {
 
                 enemy1.posCoinY = 10000
                 this.score += 10
+
                 if ((this.timer + 5) >= 60) {
+
                     this.timer = 60
+
                 } else {
+
                     this.timer += 5
+                    
                 }
 
             }
@@ -323,8 +333,6 @@ const myGame = {
                 enemy1.posCoinX + enemy1.coinSizeW > this.player1.playerPosX &&
                 enemy1.posCoinY < this.player1.playerPosY + this.player1.playerH &&
                 enemy1.coinSizeH + enemy1.posCoinY > this.player1.playerPosY) {
-
-
 
                 this.badCoinCounter = 100
                 enemy1.posCoinY = 10000
