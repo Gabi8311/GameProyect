@@ -6,8 +6,8 @@ const myGame = {
     license: undefined,
     canvasDom: undefined,
     ctx: undefined,
-    background1: undefined,
-    spriteBg: undefined,
+    bgPlanet: undefined,
+    bgAsteroids: undefined,
     interval: undefined,
     badCoinCounter: undefined,
     audioGame: undefined,
@@ -21,20 +21,19 @@ const myGame = {
     player1: undefined,
     score: 0,
     timer: 60,
-    killed: undefined,
     generateCoin: undefined,
     frames: 0,
     numRandom: 0,
-    // keyCaps: {
-    //     UP: 38,
-    //     DOWN: 40,
-    //     LEFT: 37,
-    //     RIGHT: 39,
-    //     SHOOT: 32,
-    // },
+    keyCaps: {
+        UP: 87,
+        DOWN: 83,
+        LEFT: 65,
+        RIGHT: 68,
+        SHOOT: 76,
+    },
 
     canvasSize: {
-        w: innerWidth,
+        w: 900,
         h: innerHeight,
         bgPosX: 0,
         bgPosY: 0
@@ -42,47 +41,45 @@ const myGame = {
 
     init(id) {
 
-
-
-
         this.canvasDom = document.getElementById(id)
         this.canvasDom.setAttribute('width', this.canvasSize.w)
         this.canvasDom.setAttribute('height', this.canvasSize.h)
         this.ctx = this.canvasDom.getContext('2d')
 
-        this.player1 = new SpritePlayer(this.ctx, innerWidth / 2, innerHeight - 150, 100, 100)
 
-        this.spriteBg = new BgSprite(this.ctx, 0, 0, this.canvasSize.w, this.canvasSize.h, 5)
+        this.bgPlanet = new BgPlanet(this.ctx, 0, 0, this.canvasSize.w, this.canvasSize.h, 3)
+        this.bgAsteroids = new BgAsteroids(this.ctx, 0, 0, this.canvasSize.w, this.canvasSize.h, 5)
+        this.player1 = new SpritePlayer(this.ctx, this.canvasSize.w / 2, innerHeight - 150, 80, 100)
 
-        // player.initPlayer()
-        this.setEventListeners()
-        background.initBackground()
+        this.setListeners()
 
         this.start()
 
+
     },
 
-    setEventListeners() {
+    setListeners() {
 
         document.onkeydown = e => {
+            console.log(e)
             if (this.badCoinCounter <= 100) {
 
-                e.keyCode === 39 ? this.player1.moveNave('left') : null
-                e.keyCode === 37 ? this.player1.moveNave('right') : null
-                e.keyCode === 40 ? this.player1.moveNave('up') : null
-                e.keyCode === 38 ? this.player1.moveNave('down') : null
-                e.keyCode === 88 ? this.player1.shoot(this.ctx) : null
+                e.keyCode === this.keyCaps.RIGHT ? this.player1.moveNave('left') : null
+                e.keyCode === this.keyCaps.LEFT ? this.player1.moveNave('right') : null
+                e.keyCode === this.keyCaps.DOWN ? this.player1.moveNave('up') : null
+                e.keyCode === this.keyCaps.UP ? this.player1.moveNave('down') : null
+                //e.keyCode === this.this.keyCaps.SHOOT ? this.player1.shoot(this.ctx) : null
 
             } else {
-                e.keyCode === 37 ? this.player1.moveNave('left') : null
-                e.keyCode === 39 ? this.player1.moveNave('right') : null
-                e.keyCode === 38 ? this.player1.moveNave('up') : null
-                e.keyCode === 40 ? this.player1.moveNave('down') : null
-                e.keyCode === 88 ? this.player1.shoot(this.ctx) : null
+                e.keyCode === this.keyCaps.LEFT ? this.player1.moveNave('left') : null
+                e.keyCode === this.keyCaps.RIGHT ? this.player1.moveNave('right') : null
+                e.keyCode === this.keyCaps.UP ? this.player1.moveNave('up') : null
+                e.keyCode === this.keyCaps.DOWN ? this.player1.moveNave('down') : null
+                e.keyCode === this.keyCaps.SHOOT ? this.player1.shoot(this.ctx) : null
                 this.badCoinCounter = undefined
 
-
             }
+
         }
 
     },
@@ -92,16 +89,20 @@ const myGame = {
         this.audioCoin = new Audio('audio/moneda.mp3')
         this.audioGame = new Audio('audio/wii.mp3')
         this.audioLaser = new Audio('audio/laser.wav')
+        this.audioOver = new Audio('audio/gameOver.mp3')
+        
+        this.audioGame.play()
+       
         this.interval = setInterval(() => {
-            this.audioGame.play()
-            this.audioGame.volume = 0.1
-
+            
+            this.audioButton()
+            this.audioGame.volume = 0.2
 
             if (this.badCoinCounter === 0) {
 
                 this.badCoinCounter = undefined
-            }
 
+            }
 
             this.clearScreen()
 
@@ -109,9 +110,9 @@ const myGame = {
 
             this.badCoinCounter--
 
-            background.drawBackground(this.ctx)
+            this.bgPlanet.drawBg()
 
-            this.spriteBg.drawAsteroid()
+            this.bgAsteroids.drawBg()
 
             this.player1.drawSpritePlayer(this.frames)
 
@@ -132,7 +133,9 @@ const myGame = {
             this.player1.clearBullets()
 
             if (this.scoreLife === 0 || this.timer === 0) {
+
                 this.gameOver()
+
             }
 
             this.drawScoreLife()
@@ -141,20 +144,34 @@ const myGame = {
             this.clearEnemy()
             this.clearCoins()
 
-
-
         }, 60)
 
     },
+
     gameOver() {
+        this.audioOver.play()
+        this.audioGame.pause()
+
 
         let myImage = new Image()
         myImage.src = 'images/GameOver.png'
-        myImage.onload = () => this.ctx.drawImage(myImage, innerWidth / 2 - 200, innerHeight / 2 - 100, 400, 200)
+        myImage.onload = () => this.ctx.drawImage(myImage, this.canvasSize.w / 2 - 200, innerHeight / 2 - 100, 400, 200)
         let filter = new Image()
         filter.src = 'images/filtro.png'
-        filter.onload = () => this.ctx.drawImage(filter, 0, 0, innerWidth, innerHeight)
+        filter.onload = () => this.ctx.drawImage(filter, 0, 0, this.canvasSize.w, innerHeight)
         clearInterval(this.interval)
+
+        let newDiv = document.createElement('div')
+        let newContent = document.createTextNode(`YOUR SCORE IS ${this.score}`)
+        newDiv.appendChild(newContent)
+        
+        
+        let currentDiv = document.getElementById(".game")
+        document.body.insertBefore(newDiv, currentDiv)
+        newDiv.classList.add("inexistente")
+        
+        
+        
 
     },
 
@@ -165,46 +182,62 @@ const myGame = {
         if (this.scoreLife === 3) {
             heart = new Image()
             heart.src = 'images/healNave3.png'
-            this.ctx.drawImage(heart, innerWidth - 140, 10, 120, 50)
+            this.ctx.drawImage(heart, this.canvasSize.w - 140, 10, 120, 50)
 
         } else if (this.scoreLife === 2) {
             heart = new Image()
             heart.src = 'images/healNave2.png'
-            this.ctx.drawImage(heart, innerWidth - 140, 10, 80, 50)
+            this.ctx.drawImage(heart, this.canvasSize.w - 140, 10, 80, 50)
 
         } else if (this.scoreLife === 1) {
 
             heart = new Image()
             heart.src = 'images/healNave1.png'
-            this.ctx.drawImage(heart, innerWidth - 140, 10, 40, 50)
+            this.ctx.drawImage(heart, this.canvasSize.w - 140, 10, 40, 50)
 
-        } else {
-
-            this.gameOver()
-        }
+        } 
 
     },
+
+    audioButton() {
+
+        document.getElementById("audio-button").onclick = function () {
+
+
+            this.audioGame.pause()
+
+        }.bind(myGame)
+
+
+    },
+
     drawScore() {
-        this.ctx.font = "32px Times New Roman";
-        this.ctx.fillStyle = "black";
-        this.ctx.fillText("Score: " + this.score, 50, 50);
-    },
-    drawTime() {
+
         this.ctx.font = "32px Times New Roman";
         this.ctx.fillStyle = "white";
-        this.ctx.fillText("Timer: " + this.timer, innerWidth / 2 - 50, 50);
+        this.ctx.fillText("Score: " + this.score, 50, 50);
+
+    },
+    drawTime() {
+
+        this.ctx.font = "32px Times New Roman";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText("Timer: " + this.timer, this.canvasSize.w / 2 - 50, 50);
         this.frames % 16 === 0 ? this.timer-- : null
+
     },
 
     clearScreen() {
+
         this.ctx.clearRect(0, 0, this.canvasSize.w, this.canvasSize.h)
+
     },
 
     generateEnemys() {
 
-        this.frames % 20 === 0 ? this.enemys.push(new SoftEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 70, 70, 10)) : null
+        this.frames % 20 === 0 ? this.enemys.push(new SoftEnemy(this.ctx, this.generateRandom(this.canvasSize.w - 100, 0), 0, 70, 70, 10)) : null
         //SEGUNDA CREACION DE ENEMYS
-        this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(window.innerWidth - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
+        this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(this.canvasSize.w - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
 
     },
 
@@ -236,9 +269,9 @@ const myGame = {
             this.player1.bullets.forEach(bullet1 => {
 
                 if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
-                    enemy1.posEnemyX + enemy1.enemyW - 30 > bullet1.bulletX &&
-                    enemy1.posEnemyY < bullet1.bulletY + 100 + bullet1.bulletH &&
-                    enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
+                    enemy1.posEnemyX + enemy1.enemyW > bullet1.bulletX &&
+                    enemy1.posEnemyY < bullet1.bulletY + bullet1.bulletH &&
+                    enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY) {
 
                     this.generateCoin = this.generateRandom(11, 1)
                     this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
@@ -259,11 +292,11 @@ const myGame = {
         this.enemys.forEach(enemy1 => {
 
             if (enemy1.posEnemyX < this.player1.playerPosX + this.player1.playerW &&
-                enemy1.posEnemyX + enemy1.enemyW - 40 > this.player1.playerPosX &&
-                enemy1.posEnemyY < this.player1.playerPosY + 50 + this.player1.playerH &&
-                enemy1.enemyH + enemy1.posEnemyY > this.player1.playerPosY + 50) {
+                enemy1.posEnemyX + enemy1.enemyW > this.player1.playerPosX &&
+                enemy1.posEnemyY < this.player1.playerPosY + this.player1.playerH &&
+                enemy1.enemyH + enemy1.posEnemyY > this.player1.playerPosY) {
 
-                this.player1.playerPosX = innerWidth / 2,
+                this.player1.playerPosX = this.canvasSize.w / 2,
                     this.player1.playerPosY = innerHeight - 100
                 this.scoreLife--
                 enemy1.posEnemyY = 10000
@@ -276,14 +309,15 @@ const myGame = {
         this.enemysStrong.forEach(enemy1 => {
 
             if (enemy1.posEnemyX < this.player1.playerPosX + this.player1.playerW &&
-                enemy1.posEnemyX + enemy1.enemyW - 40 > this.player1.playerPosX &&
-                enemy1.posEnemyY < this.player1.playerPosY + 50 + this.player1.playerH &&
-                enemy1.enemyH + enemy1.posEnemyY > this.player1.playerPosY + 50) {
+                enemy1.posEnemyX + enemy1.enemyW > this.player1.playerPosX &&
+                enemy1.posEnemyY < this.player1.playerPosY + this.player1.playerH &&
+                enemy1.enemyH + enemy1.posEnemyY > this.player1.playerPosY) {
 
-                this.player1.playerPosX = innerWidth / 2,
+                this.player1.playerPosX = this.canvasSize.w / 2,
                     this.player1.playerPosY = innerHeight - 100
                 this.scoreLife--
                 enemy1.posEnemyY = 10000
+
             }
 
         })
@@ -293,9 +327,9 @@ const myGame = {
             this.player1.bullets.forEach(bullet1 => {
 
                 if (enemy1.posEnemyX < bullet1.bulletX + bullet1.bulletW &&
-                    enemy1.posEnemyX + enemy1.enemyW - 30 > bullet1.bulletX &&
-                    enemy1.posEnemyY < bullet1.bulletY + 100 + bullet1.bulletH &&
-                    enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY + 100) {
+                    enemy1.posEnemyX + enemy1.enemyW > bullet1.bulletX &&
+                    enemy1.posEnemyY < bullet1.bulletY + bullet1.bulletH &&
+                    enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY) {
 
                     enemy1.health--
 
@@ -325,6 +359,7 @@ const myGame = {
                 enemy1.posCoinY = 10000
                 this.score += 10
                 this.audioCoin.play()
+                this.audioCoin.volume = .3
 
                 if ((this.timer + 5) >= 60) {
 
@@ -355,6 +390,7 @@ const myGame = {
             }
 
         })
+
     }
 
 }
