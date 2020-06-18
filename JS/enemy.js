@@ -59,7 +59,7 @@ class StrongEnemy extends Enemy {
         this.health = health
         this.enemyImg = new Image()
         this.enemyImg.src = 'images/Fantasma.png'
-        this.enemyImg.frames = 10
+        this.enemyImg.frames = 4
         this.enemyImg.framesIndex = 0
     }
 
@@ -80,5 +80,7 @@ class SoftEnemy extends Enemy {
     }
 
 }
+
+
 
 

@@ -55,7 +55,7 @@ class BadCoins extends Coins {
     }
     
     moveCoin() {
-        this.posCoinX += this.velCoinX
+        this.posCoinX += myGame.generateRandom (30,-30)
         this.posCoinY += this.velCoin
 
         this.posCoinY > myGame.canvasSize.h - this.coinSizeH ? this.velCoinY *= -1 : null
