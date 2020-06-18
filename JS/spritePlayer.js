@@ -8,7 +8,7 @@ class SpritePlayer {
         this.playerH = playerH
         this.image = new Image()
         this.image.src = 'images/naveFuegoo.png'
-        this.velPlayer = 5
+        this.velPlayer = 10
         this.image.frames = 4
         this.image.framesIndex =0
         this.bullets= []
@@ -39,11 +39,24 @@ class SpritePlayer {
 
     }
 
-    moveNave(dir) {
-        dir === 'left' && this.playerPosX >= 0 ? this.playerPosX -= this.velPlayer : null
-        dir === 'right' && this.playerPosX <= myGame.canvasSize.w - 80 ? this.playerPosX += this.velPlayer : null
-        dir === 'up' && this.playerPosY >= 500 ? this.playerPosY : this.playerPosY += this.velPlayer
-        dir === 'down' && this.playerPosY <= innerHeight - this.playerH ? this.playerPosY : this.playerPosY -= this.velPlayer
+
+
+
+    move() {
+        
+        if (myGame.playerKeys.arrowUp && this.playerPosY <= innerHeight-150) {
+            this.playerPosY += this.velPlayer
+        } 
+        if (myGame.playerKeys.arrowRight && this.playerPosX <= myGame.canvasSize.w - 100) {
+            this.playerPosX += this.velPlayer 
+        }
+        if (myGame.playerKeys.arrowDown && this.playerPosY >= innerHeight/2) {
+            this.playerPosY -= this.velPlayer
+        }
+        if (myGame.playerKeys.arrowLeft && this.playerPosX >= 15) {
+            this.playerPosX -= this.velPlayer
+        }
+       
     }
 
     shoot(ctx) {

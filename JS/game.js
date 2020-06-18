@@ -9,7 +9,7 @@ const myGame = {
     bgPlanet: undefined,
     bgAsteroids: undefined,
     interval: undefined,
-    badCoinCounter: undefined,
+    badCoinCounter: 0,
     audioGame: undefined,
     audioCoin: undefined,
     audioLaser: undefined,
@@ -24,6 +24,13 @@ const myGame = {
     generateCoin: undefined,
     frames: 0,
     numRandom: 0,
+    playerKeys: {
+        arrowUp: false,
+        arrowRight: false,
+        arrowDown: false,
+        arrowLeft: false,
+        space: false
+    },
     keyCaps: {
         UP: 87,
         DOWN: 83,
@@ -59,30 +66,90 @@ const myGame = {
     },
 
     setListeners() {
+        
+        
 
-        document.onkeydown = e => {
-            console.log(e)
-            if (this.badCoinCounter <= 100) {
 
-                e.keyCode === this.keyCaps.RIGHT ? this.player1.moveNave('left') : null
-                e.keyCode === this.keyCaps.LEFT ? this.player1.moveNave('right') : null
-                e.keyCode === this.keyCaps.DOWN ? this.player1.moveNave('up') : null
-                e.keyCode === this.keyCaps.UP ? this.player1.moveNave('down') : null
-                //e.keyCode === this.this.keyCaps.SHOOT ? this.player1.shoot(this.ctx) : null
+            
+               
+            
 
-            } else {
-                e.keyCode === this.keyCaps.LEFT ? this.player1.moveNave('left') : null
-                e.keyCode === this.keyCaps.RIGHT ? this.player1.moveNave('right') : null
-                e.keyCode === this.keyCaps.UP ? this.player1.moveNave('up') : null
-                e.keyCode === this.keyCaps.DOWN ? this.player1.moveNave('down') : null
-                e.keyCode === this.keyCaps.SHOOT ? this.player1.shoot(this.ctx) : null
-                this.badCoinCounter = undefined
+                document.addEventListener("keydown", e => {
+                    e.preventDefault();
+                    if (e.keyCode === 68 && this.badCoinCounter >= 1) {
 
-            }
+                        this.playerKeys.arrowLeft = true;
+                    } else if (e.keyCode === 68 && this.badCoinCounter === 0 ){ 
+                        this.playerKeys.arrowRight = true;
 
-        }
+                    }
+                    if (e.keyCode === 65 && this.badCoinCounter >=1 ) {
+                        this.playerKeys.arrowRight = true;
+                    } else if (e.keyCode === 65 && this.badCoinCounter === 0){ 
+                        this.playerKeys.arrowLeft = true;
+
+                    }
+                });
+                document.addEventListener("keyup", e => {
+                    e.preventDefault();
+                    if (e.keyCode === 68 && this.badCoinCounter >=1 ) {
+                        this.playerKeys.arrowLeft = false;
+                    } else if (e.keyCode === 68 && this.badCoinCounter === 0) {
+                        this.playerKeys.arrowRight = false;
+
+                    }
+                    if (e.keyCode === 65 && this.badCoinCounter >=1 ) {
+                        this.playerKeys.arrowRight = false;
+                    } else if (e.keyCode === 65 && this.badCoinCounter === 0) {
+
+                        this.playerKeys.arrowLeft = false;
+
+                    }
+                });
+                document.addEventListener("keydown", e => {
+                    e.preventDefault();
+                    if (e.keyCode === 83 && this.badCoinCounter >=1  ) {
+                        this.playerKeys.arrowDown = true;
+                    } else if (e.keyCode === 83 && this.badCoinCounter === 0){
+                        this.playerKeys.arrowUp = true;
+                    }
+                    
+                    if (e.keyCode === 87 && this.badCoinCounter >= 1) {
+                        this.playerKeys.arrowUp = true;
+                    }else if (e.keyCode === 87 && this.badCoinCounter === 0){
+                        this.playerKeys.arrowDown = true;
+                    }
+                });
+                document.addEventListener("keyup", e => {
+                    e.preventDefault();
+                    if (e.keyCode === 83 && this.badCoinCounter >= 1) {
+                        this.playerKeys.arrowDown = false;
+                    }else if(e.keyCode === 83 && this.badCoinCounter === 0){
+                        this.playerKeys.arrowUp = false;
+                    }
+                    if (e.keyCode === 87 && this.badCoinCounter >= 1) {
+                        this.playerKeys.arrowUp = false;
+                    }else if(e.keyCode === 87 && this.badCoinCounter === 0){
+                        this.playerKeys.arrowDown = false;
+                    }
+                });
+
+
+
+
+                document.onkeydown = e => {
+                    e.keyCode === this.keyCaps.SHOOT ? this.player1.shoot(this.ctx) : null
+                }
+
 
     },
+
+
+    //-------------------------------------------------------------------------------------
+
+
+    //----------------------------------------------------------------------------------
+
 
     start() {
 
@@ -90,25 +157,34 @@ const myGame = {
         this.audioGame = new Audio('audio/wii.mp3')
         this.audioLaser = new Audio('audio/laser.wav')
         this.audioOver = new Audio('audio/gameOver.mp3')
-        
+
         this.audioGame.play()
-       
+
         this.interval = setInterval(() => {
             
+            
+            
+ 
             this.audioButton()
             this.audioGame.volume = 0.2
 
-            if (this.badCoinCounter === 0) {
-
-                this.badCoinCounter = undefined
-
+            this.badCoinCounter--
+            
+            if (this.badCoinCounter < 0) {
+                
+                this.badCoinCounter = 0
+                
             }
+            
+            console.log(this.badCoinCounter)
+            
+            
 
             this.clearScreen()
+            this.player1.move()
 
             this.frames++
 
-            this.badCoinCounter--
 
             this.bgPlanet.drawBg()
 
@@ -164,14 +240,14 @@ const myGame = {
         let newDiv = document.createElement('div')
         let newContent = document.createTextNode(`YOUR SCORE IS ${this.score}`)
         newDiv.appendChild(newContent)
-        
-        
+
+
         let currentDiv = document.getElementById(".game")
         document.body.insertBefore(newDiv, currentDiv)
         newDiv.classList.add("inexistente")
-        
-        
-        
+
+
+
 
     },
 
@@ -195,7 +271,7 @@ const myGame = {
             heart.src = 'images/healNave1.png'
             this.ctx.drawImage(heart, this.canvasSize.w - 140, 10, 40, 50)
 
-        } 
+        }
 
     },
 
@@ -235,9 +311,9 @@ const myGame = {
 
     generateEnemys() {
 
-        this.frames % 20 === 0 ? this.enemys.push(new SoftEnemy(this.ctx, this.generateRandom(this.canvasSize.w - 100, 0), 0, 70, 70, 10)) : null
+        this.frames % 20 === 0 ? this.enemys.push(new SoftEnemy(this.ctx, this.generateRandom(this.canvasSize.w - 100, 0), 0, 70, 70, this.generateRandom(15, 8))) : null
         //SEGUNDA CREACION DE ENEMYS
-        this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(this.canvasSize.w - 100, 0), 0, 100, 100, 10, this.generateRandom(6, 2))) : null
+        this.frames % 36 === 0 ? this.enemysStrong.push(new StrongEnemy(this.ctx, this.generateRandom(this.canvasSize.w - 100, 0), 0, 100, 100, this.generateRandom(20, 8), this.generateRandom(6, 2))) : null
 
     },
 
@@ -274,9 +350,9 @@ const myGame = {
                     enemy1.enemyH + enemy1.posEnemyY > bullet1.bulletY) {
 
                     this.generateCoin = this.generateRandom(11, 1)
-                    this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
+                    this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 20)) : null
 
-                    this.generateCoin > 4 ? this.goodCoins.push(new GoodCoin(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
+                    this.generateCoin > 4 ? this.goodCoins.push(new GoodCoin(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 20)) : null
 
                     this.player1.bullets.pop()
 
@@ -337,9 +413,9 @@ const myGame = {
 
                     if (enemy1.health === 0) {
                         this.generateCoin = this.generateRandom(11, 1)
-                        this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
+                        this.generateCoin <= 4 ? this.badCoins.push(new BadCoins(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 20)) : null
 
-                        this.generateCoin > 4 ? this.goodCoins.push(new GoodCoin(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 10)) : null
+                        this.generateCoin > 4 ? this.goodCoins.push(new GoodCoin(this.ctx, enemy1.posEnemyX, enemy1.posEnemyY, 30, 30, 20)) : null
                         enemy1.posEnemyY = 10000
                     }
 
@@ -383,9 +459,10 @@ const myGame = {
                 enemy1.posCoinX + enemy1.coinSizeW > this.player1.playerPosX &&
                 enemy1.posCoinY < this.player1.playerPosY + this.player1.playerH &&
                 enemy1.coinSizeH + enemy1.posCoinY > this.player1.playerPosY) {
-
-                this.badCoinCounter = 100
-                enemy1.posCoinY = 10000
+                    
+                    this.badCoinCounter = 100
+                    enemy1.posCoinY = 10000
+                        this.setListeners()
 
             }
 
